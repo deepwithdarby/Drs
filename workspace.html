@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StegoNet - Workspace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <a href="index.html" class="logo-link">
+                <span class="logo-icon">🔒</span>
+                <h1 class="logo-text">StegoNet</h1>
+            </a>
+        </div>
+        <div class="user-info">
+            <span id="user-display"></span>
+            <button id="signout-btn" class="nav-button">Sign Out</button>
+        </div>
+        <div class="theme-toggle-container">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle" class="theme-toggle-label"></label>
+        </div>
+    </header>
+
+    <main class="workspace-main">
+        <div class="tab-bar">
+            <button class="tab-button active" data-tab="text-stego">Text Steganography</button>
+            <button class="tab-button" data-tab="image-stego">Image Steganography</button>
+            <button class="tab-button" data-tab="audio-stego">Audio Steganography</button>
+            <button class="tab-button" data-tab="video-stego">Video Steganography</button>
+        </div>
+
+        <div class="tab-content-container">
+            <!-- Text Steganography Tab -->
+            <div id="text-stego" class="tab-content active">
+                <h3>Text Steganography</h3>
+                <p class="description">Hide a message inside a cover text using invisible zero-width characters.</p>
+                <div class="tool-section">
+                    <h4>Encode</h4>
+                    <textarea id="text-cover-input" placeholder="Enter cover text..."></textarea>
+                    <textarea id="text-secret-input" placeholder="Enter secret message..."></textarea>
+                    <input type="password" id="text-encode-password" placeholder="Enter password (optional)">
+                    <button id="text-encode-btn" class="tool-button">Encode</button>
+                    <div class="output-container">
+                        <textarea id="text-encoded-output" placeholder="Encoded text will appear here..." readonly></textarea>
+                        <button id="text-copy-btn" class="copy-button">Copy</button>
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h4>Decode</h4>
+                    <textarea id="text-decode-input" placeholder="Paste encoded text here..."></textarea>
+                    <input type="password" id="text-decode-password" placeholder="Enter password (optional)">
+                    <button id="text-decode-btn" class="tool-button">Decode</button>
+                    <div class="output-container">
+                        <textarea id="text-decoded-output" placeholder="Decoded message will appear here..." readonly></textarea>
+                        <button id="text-copy-decoded-btn" class="copy-button">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image Steganography Tab -->
+            <div id="image-stego" class="tab-content">
+                <h3>Image Steganography</h3>
+                <p class="description">Embed a message into an image's pixel data using the LSB method.</p>
+                <div class="tool-section">
+                    <h4>Encode</h4>
+                    <input type="file" id="image-file-encode" accept="image/png, image/jpeg, image/bmp, image/webp">
+                    <canvas id="image-preview-encode"></canvas>
+                    <p id="image-size-info-encode" class="info-text"></p>
+                    <textarea id="image-secret-input" placeholder="Enter secret message..."></textarea>
+                    <input type="password" id="image-encode-password" placeholder="Enter password (optional)">
+                    <button id="image-encode-btn" class="tool-button">Encode</button>
+                    <div class="output-container">
+                        <canvas id="image-encoded-preview"></canvas>
+                        <a id="image-download-link" class="download-link" download="stego-image.png">Download Encoded Image</a>
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h4>Decode</h4>
+                    <input type="file" id="image-file-decode" accept="image/png, image/jpeg, image/bmp, image/webp">
+                    <canvas id="image-preview-decode"></canvas>
+                    <input type="password" id="image-decode-password" placeholder="Enter password (optional)">
+                    <button id="image-decode-btn" class="tool-button">Decode</button>
+                    <div class="output-container">
+                        <textarea id="image-decoded-output" placeholder="Decoded message will appear here..." readonly></textarea>
+                        <button id="image-copy-decoded-btn" class="copy-button">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audio Steganography Tab -->
+            <div id="audio-stego" class="tab-content">
+                <h3>Audio Steganography</h3>
+                <p class="description">Hide a message in an audio file's sound data (LSB method on WAV files).</p>
+                <div class="tool-section">
+                    <h4>Encode</h4>
+                    <input type="file" id="audio-file-encode" accept="audio/wav">
+                    <audio id="audio-preview-encode" controls></audio>
+                    <p id="audio-size-info-encode" class="info-text"></p>
+                    <textarea id="audio-secret-input" placeholder="Enter secret message..."></textarea>
+                    <input type="password" id="audio-encode-password" placeholder="Enter password (optional)">
+                    <button id="audio-encode-btn" class="tool-button">Encode</button>
+                    <div class="output-container">
+                        <audio id="audio-encoded-preview" controls></audio>
+                        <a id="audio-download-link" class="download-link" download="stego-audio.wav">Download Encoded Audio</a>
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h4>Decode</h4>
+                    <input type="file" id="audio-file-decode" accept="audio/wav">
+                    <audio id="audio-preview-decode" controls></audio>
+                    <input type="password" id="audio-decode-password" placeholder="Enter password (optional)">
+                    <button id="audio-decode-btn" class="tool-button">Decode</button>
+                    <div class="output-container">
+                        <textarea id="audio-decoded-output" placeholder="Decoded message will appear here..." readonly></textarea>
+                        <button id="audio-copy-decoded-btn" class="copy-button">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Steganography Tab -->
+            <div id="video-stego" class="tab-content">
+                <h3>Video Steganography</h3>
+                <p class="description">Embed a message into a video file (currently supported only on the audio track of MP4 files).</p>
+                <div class="tool-section">
+                    <h4>Encode</h4>
+                    <input type="file" id="video-file-encode" accept="video/mp4">
+                    <video id="video-preview-encode" controls></video>
+                    <textarea id="video-secret-input" placeholder="Enter secret message..."></textarea>
+                    <input type="password" id="video-encode-password" placeholder="Enter password (optional)">
+                    <button id="video-encode-btn" class="tool-button">Encode</button>
+                    <div class="output-container">
+                        <video id="video-encoded-preview" controls></video>
+                        <a id="video-download-link" class="download-link" download="stego-video.mp4">Download Encoded Video</a>
+                    </div>
+                </div>
+                <div class="tool-section">
+                    <h4>Decode</h4>
+                    <input type="file" id="video-file-decode" accept="video/mp4">
+                    <video id="video-preview-decode" controls></video>
+                    <input type="password" id="video-decode-password" placeholder="Enter password (optional)">
+                    <button id="video-decode-btn" class="tool-button">Decode</button>
+                    <div class="output-container">
+                        <textarea id="video-decoded-output" placeholder="Decoded message will appear here..." readonly></textarea>
+                        <button id="video-copy-decoded-btn" class="copy-button">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 StegoNet. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Message Box for alerts -->
+    <div id="message-box" class="message-box">
+        <p id="message-text"></p>
+        <button id="close-message-btn" class="close-message-btn">&times;</button>
+    </div>
+
+    <script>
+        // --- Firebase Initialization and Auth Check ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQ4sTdy1dC4IyMJFC9Yz3bVEBSEU_sbHI",
+            authDomain: "messaging-website-8cee3.firebaseapp.com",
+            projectId: "messaging-website-8cee3",
+            storageBucket: "messaging-website-8cee3.firebasestorage.app",
+            messagingSenderId: "1017918066104",
+            appId: "1:1017918066104:web:823f87c4b2c3d4929ed34d",
+            measurementId: "G-Q07MV0TB0H"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const userDisplay = document.getElementById('user-display');
+        const signoutBtn = document.getElementById('signout-btn');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+        const closeMessageBtn = document.getElementById('close-message-btn');
+
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = "index.html"; // Redirect to login if not signed in
+            } else {
+                userDisplay.textContent = `Hello, ${user.displayName.split(' ')[0]}!`;
+            }
+        });
+
+        signoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = "index.html";
+            }).catch((error) => {
+                console.error("Sign Out Error:", error);
+                showMessage("Sign out failed. Please try again.");
+            });
+        });
+
+        // --- Utility Functions for Web Crypto API ---
+        async function getKeyFromPassword(password, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                "raw",
+                enc.encode(password),
+                { name: "PBKDF2" },
+                false,
+                ["deriveKey"]
+            );
+            return crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: salt,
+                    iterations: 100000,
+                    hash: "SHA-256",
+                },
+                keyMaterial,
+                { name: "AES-GCM", length: 256 },
+                true,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        async function encryptMessage(message, password) {
+            const enc = new TextEncoder();
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const key = await getKeyFromPassword(password, salt);
+            const encrypted = await crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: iv },
+                key,
+                enc.encode(message)
+            );
+            return {
+                salt: Array.from(salt),
+                iv: Array.from(iv),
+                encryptedData: Array.from(new Uint8Array(encrypted))
+            };
+        }
+
+        async function decryptMessage(data, password) {
+            const dec = new TextDecoder();
+            const { salt, iv, encryptedData } = data;
+            const key = await getKeyFromPassword(password, new Uint8Array(salt));
+            try {
+                const decrypted = await crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: new Uint8Array(iv) },
+                    key,
+                    new Uint8Array(encryptedData)
+                );
+                return dec.decode(decrypted);
+            } catch (e) {
+                console.error("Decryption failed:", e);
+                return null;
+            }
+        }
+
+        function showMessage(text, isError = false) {
+            messageText.textContent = text;
+            messageBox.style.display = 'block';
+            if (isError) {
+                messageBox.classList.add('error');
+            } else {
+                messageBox.classList.remove('error');
+            }
+        }
+
+        closeMessageBtn.addEventListener('click', () => {
+            messageBox.style.display = 'none';
+        });
+
+        // --- Tabs and Sections Logic ---
+        const tabs = document.querySelectorAll('.tab-button');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                contents.forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // --- Steganography Implementations ---
+
+        // Text Steganography (Zero-Width Characters)
+        const TEXT_ZEROWIDTH_CHARACTERS = ['\u200B', '\u200C', '\u200D']; // Zero-width space, non-joiner, joiner
+        const textEncodeBtn = document.getElementById('text-encode-btn');
+        const textDecodeBtn = document.getElementById('text-decode-btn');
+
+        async function encodeText() {
+            const coverText = document.getElementById('text-cover-input').value;
+            const secretMessage = document.getElementById('text-secret-input').value;
+            const password = document.getElementById('text-encode-password').value;
+            
+            if (!coverText || !secretMessage) {
+                showMessage("Please enter both cover text and a secret message.", true);
+                return;
+            }
+
+            let messageToEmbed = secretMessage;
+            if (password) {
+                try {
+                    const encryptedData = await encryptMessage(secretMessage, password);
+                    messageToEmbed = JSON.stringify(encryptedData);
+                } catch (e) {
+                    showMessage("Encryption failed. Please try again.", true);
+                    console.error(e);
+                    return;
+                }
+            }
+
+            let binaryMessage = new TextEncoder().encode(messageToEmbed).reduce((acc, byte) => acc + byte.toString(2).padStart(8, '0'), '');
+            let encodedText = "";
+            let messageIndex = 0;
+            const separator = '\u0000'; // Null character to mark end of message
+
+            binaryMessage += separator;
+
+            for (let i = 0; i < coverText.length; i++) {
+                encodedText += coverText[i];
+                if (messageIndex < binaryMessage.length) {
+                    const bit = binaryMessage[messageIndex];
+                    if (bit === '0') {
+                        encodedText += TEXT_ZEROWIDTH_CHARACTERS[0];
+                    } else if (bit === '1') {
+                        encodedText += TEXT_ZEROWIDTH_CHARACTERS[1];
+                    }
+                    messageIndex++;
+                } else if (messageIndex === binaryMessage.length) {
+                    break;
+                }
+            }
+            if (messageIndex < binaryMessage.length) {
+                showMessage("Not enough cover text to hide the message.", true);
+            } else {
+                document.getElementById('text-encoded-output').value = encodedText;
+                showMessage("Message successfully encoded!");
+            }
+        }
+
+        async function decodeText() {
+            const encodedText = document.getElementById('text-decode-input').value;
+            const password = document.getElementById('text-decode-password').value;
+
+            let binaryMessage = "";
+            for (let i = 0; i < encodedText.length; i++) {
+                if (encodedText[i] === TEXT_ZEROWIDTH_CHARACTERS[0]) {
+                    binaryMessage += '0';
+                } else if (encodedText[i] === TEXT_ZEROWIDTH_CHARACTERS[1]) {
+                    binaryMessage += '1';
+                }
+            }
+
+            // Split the binary message into 8-bit chunks
+            const messageBytes = [];
+            for (let i = 0; i < binaryMessage.length; i += 8) {
+                const byte = parseInt(binaryMessage.substring(i, i + 8), 2);
+                if (byte === 0) { // Null character separator
+                    break;
+                }
+                messageBytes.push(byte);
+            }
+
+            const messageToDecode = new TextDecoder().decode(new Uint8Array(messageBytes));
+            let decodedMessage = messageToDecode;
+            
+            if (password) {
+                try {
+                    const data = JSON.parse(messageToDecode);
+                    decodedMessage = await decryptMessage(data, password);
+                    if (!decodedMessage) {
+                        showMessage("Decryption failed. Check your password.", true);
+                        return;
+                    }
+                } catch (e) {
+                    showMessage("Decryption failed. The message may not be encrypted or the password is wrong.", true);
+                    console.error(e);
+                    return;
+                }
+            }
+
+            document.getElementById('text-decoded-output').value = decodedMessage;
+            showMessage("Message successfully decoded!");
+        }
+
+        textEncodeBtn.addEventListener('click', encodeText);
+        textDecodeBtn.addEventListener('click', decodeText);
+        document.getElementById('text-copy-btn').addEventListener('click', () => {
+            const output = document.getElementById('text-encoded-output');
+            output.select();
+            document.execCommand('copy');
+            showMessage("Encoded text copied to clipboard!");
+        });
+        document.getElementById('text-copy-decoded-btn').addEventListener('click', () => {
+            const output = document.getElementById('text-decoded-output');
+            output.select();
+            document.execCommand('copy');
+            showMessage("Decoded message copied to clipboard!");
+        });
+
+        // Image Steganography (LSB)
+        const imageEncodeFile = document.getElementById('image-file-encode');
+        const imageDecodeFile = document.getElementById('image-file-decode');
+        const imageEncodeBtn = document.getElementById('image-encode-btn');
+        const imageDecodeBtn = document.getElementById('image-decode-btn');
+
+        function lsbEncode(imageData, binaryMessage) {
+            let pixelData = imageData.data;
+            let messageIndex = 0;
+            const messageLength = binaryMessage.length;
+            
+            for (let i = 0; i < pixelData.length; i += 4) {
+                if (messageIndex < messageLength) {
+                    const bit = binaryMessage[messageIndex];
+                    pixelData[i] = (pixelData[i] & ~1) | parseInt(bit); // Manipulate LSB of red channel
+                    messageIndex++;
+                } else {
+                    break;
+                }
+            }
+            return imageData;
+        }
+        
+        function lsbDecode(imageData) {
+            let pixelData = imageData.data;
+            let binaryMessage = "";
+            for (let i = 0; i < pixelData.length; i += 4) {
+                binaryMessage += (pixelData[i] & 1).toString();
+            }
+
+            let messageBytes = [];
+            for (let i = 0; i < binaryMessage.length; i += 8) {
+                let byte = parseInt(binaryMessage.substring(i, i + 8), 2);
+                if (byte === 0) break; // Null terminator
+                messageBytes.push(byte);
+            }
+            return new TextDecoder().decode(new Uint8Array(messageBytes));
+        }
+
+        imageEncodeFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.getElementById('image-preview-encode');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    document.getElementById('image-size-info-encode').textContent = `Dimensions: ${img.width}x${img.height}`;
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        imageEncodeBtn.addEventListener('click', async () => {
+            const fileInput = document.getElementById('image-file-encode');
+            const secretMessage = document.getElementById('image-secret-input').value;
+            const password = document.getElementById('image-encode-password').value;
+            if (!fileInput.files[0] || !secretMessage) {
+                showMessage("Please select an image and enter a secret message.", true);
+                return;
+            }
+
+            let messageToEmbed = secretMessage;
+            if (password) {
+                try {
+                    const encryptedData = await encryptMessage(secretMessage, password);
+                    messageToEmbed = JSON.stringify(encryptedData);
+                } catch (e) {
+                    showMessage("Encryption failed. Please try again.", true);
+                    return;
+                }
+            }
+
+            const binaryMessage = new TextEncoder().encode(messageToEmbed + '\u0000').reduce((acc, byte) => acc + byte.toString(2).padStart(8, '0'), '');
+            
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    
+                    if (binaryMessage.length > imageData.data.length / 4) {
+                        showMessage("Secret message is too large for this image.", true);
+                        return;
+                    }
+
+                    const encodedImageData = lsbEncode(imageData, binaryMessage);
+                    const encodedCanvas = document.getElementById('image-encoded-preview');
+                    encodedCanvas.width = canvas.width;
+                    encodedCanvas.height = canvas.height;
+                    const encodedCtx = encodedCanvas.getContext('2d');
+                    encodedCtx.putImageData(encodedImageData, 0, 0);
+                    const downloadLink = document.getElementById('image-download-link');
+                    downloadLink.href = encodedCanvas.toDataURL('image/png');
+                    downloadLink.style.display = 'inline-block';
+                    showMessage("Image encoded successfully!");
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        });
+        
+        imageDecodeFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.getElementById('image-preview-decode');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        imageDecodeBtn.addEventListener('click', async () => {
+            const fileInput = document.getElementById('image-file-decode');
+            const password = document.getElementById('image-decode-password').value;
+            if (!fileInput.files[0]) {
+                showMessage("Please select an image to decode.", true);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                const img = new Image();
+                img.onload = async () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const decodedMessage = lsbDecode(imageData);
+
+                    let finalMessage = decodedMessage;
+                    if (password) {
+                        try {
+                            const data = JSON.parse(decodedMessage);
+                            finalMessage = await decryptMessage(data, password);
+                            if (!finalMessage) {
+                                showMessage("Decryption failed. Check your password.", true);
+                                return;
+                            }
+                        } catch (e) {
+                            showMessage("Decryption failed. The message may not be encrypted or the password is wrong.", true);
+                            return;
+                        }
+                    }
+                    
+                    document.getElementById('image-decoded-output').value = finalMessage;
+                    showMessage("Message decoded successfully!");
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        });
+
+        // Audio Steganography (WAV format only, LSB on PCM data)
+        const audioEncodeFile = document.getElementById('audio-file-encode');
+        const audioDecodeFile = document.getElementById('audio-file-decode');
+        const audioEncodeBtn = document.getElementById('audio-encode-btn');
+        const audioDecodeBtn = document.getElementById('audio-decode-btn');
+
+        async function processAudio(file, isEncoding, message, password) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const fileReader = new FileReader();
+            
+            fileReader.onload = async (e) => {
+                try {
+                    const audioBuffer = await audioCtx.decodeAudioData(e.target.result);
+                    const originalChannelData = audioBuffer.getChannelData(0);
+                    const modifiedChannelData = new Float32Array(originalChannelData.length);
+                    modifiedChannelData.set(originalChannelData);
+
+                    if (isEncoding) {
+                        const messageToEmbed = password ? JSON.stringify(await encryptMessage(message, password)) : message;
+                        const binaryMessage = new TextEncoder().encode(messageToEmbed + '\u0000').reduce((acc, byte) => acc + byte.toString(2).padStart(8, '0'), '');
+                        
+                        if (binaryMessage.length > modifiedChannelData.length) {
+                             showMessage("Secret message is too large for this audio file.", true);
+                             return;
+                        }
+
+                        for (let i = 0; i < binaryMessage.length; i++) {
+                            const bit = parseInt(binaryMessage[i]);
+                            const sample = modifiedChannelData[i] * 32768; // Scale to 16-bit integer
+                            const newSample = ((sample | bit) - sample) + sample;
+                            modifiedChannelData[i] = newSample / 32768; // Scale back to float32
+                        }
+
+                        const newAudioBuffer = audioCtx.createBuffer(1, modifiedChannelData.length, audioBuffer.sampleRate);
+                        newAudioBuffer.copyToChannel(modifiedChannelData, 0);
+                        
+                        const wavBlob = bufferToWav(newAudioBuffer);
+                        const downloadLink = document.getElementById('audio-download-link');
+                        downloadLink.href = URL.createObjectURL(wavBlob);
+                        downloadLink.style.display = 'inline-block';
+                        document.getElementById('audio-encoded-preview').src = URL.createObjectURL(wavBlob);
+                        showMessage("Audio encoded successfully!");
+
+                    } else { // Decoding
+                        let binaryMessage = "";
+                        for (let i = 0; i < modifiedChannelData.length; i++) {
+                            const sample = modifiedChannelData[i] * 32768;
+                            binaryMessage += (sample & 1).toString();
+                        }
+
+                        let messageBytes = [];
+                        for (let i = 0; i < binaryMessage.length; i += 8) {
+                            let byte = parseInt(binaryMessage.substring(i, i + 8), 2);
+                            if (byte === 0) break;
+                            messageBytes.push(byte);
+                        }
+
+                        let decodedMessage = new TextDecoder().decode(new Uint8Array(messageBytes));
+                        if (password) {
+                            try {
+                                const data = JSON.parse(decodedMessage);
+                                decodedMessage = await decryptMessage(data, password);
+                                if (!decodedMessage) {
+                                    showMessage("Decryption failed. Check your password.", true);
+                                    return;
+                                }
+                            } catch (e) {
+                                showMessage("Decryption failed. The message may not be encrypted or the password is wrong.", true);
+                                return;
+                            }
+                        }
+                        document.getElementById('audio-decoded-output').value = decodedMessage;
+                        showMessage("Audio decoded successfully!");
+                    }
+                } catch (e) {
+                    console.error(e);
+                    showMessage("Error processing audio file. Please ensure it is an uncompressed WAV format.", true);
+                }
+            };
+            fileReader.readAsArrayBuffer(file);
+        }
+
+        audioEncodeFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('audio-preview-encode').src = URL.createObjectURL(file);
+                document.getElementById('audio-size-info-encode').textContent = `File: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB`;
+            }
+        });
+
+        audioDecodeFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('audio-preview-decode').src = URL.createObjectURL(file);
+            }
+        });
+
+        audioEncodeBtn.addEventListener('click', () => {
+            const file = audioEncodeFile.files[0];
+            const message = document.getElementById('audio-secret-input').value;
+            const password = document.getElementById('audio-encode-password').value;
+            if (!file || !message) {
+                showMessage("Please select an audio file and enter a message.", true);
+                return;
+            }
+            processAudio(file, true, message, password);
+        });
+
+        audioDecodeBtn.addEventListener('click', () => {
+            const file = audioDecodeFile.files[0];
+            const password = document.getElementById('audio-decode-password').value;
+            if (!file) {
+                showMessage("Please select an audio file to decode.", true);
+                return;
+            }
+            processAudio(file, false, '', password);
+        });
+
+        // Helper function for WAV file creation
+        function bufferToWav(buffer) {
+            let numOfChan = buffer.numberOfChannels,
+                chanlen = buffer.length,
+                samples = buffer.getChannelData(0);
+
+            let buffer16 = new Int16Array(chanlen);
+            for (let i = 0; i < chanlen; i++) {
+                buffer16[i] = Math.max(-1, Math.min(1, samples[i])) * 0x7FFF;
+            }
+            
+            let dataLength = chanlen * 2;
+            let buffer2 = new ArrayBuffer(44 + dataLength);
+            let view = new DataView(buffer2);
+
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
+
+            let sampleRate = buffer.sampleRate;
+            let bitRate = 16;
+            let byteRate = bitRate / 8;
+            let blockAlign = numOfChan * byteRate;
+            let dataSize = dataLength;
+
+            // RIFF chunk descriptor
+            writeString(view, 0, 'RIFF'); // RIFF identifier
+            view.setUint32(4, 36 + dataSize, true); // file size
+            writeString(view, 8, 'WAVE'); // RIFF type
+
+            // format chunk
+            writeString(view, 12, 'fmt '); // format chunk identifier
+            view.setUint32(16, 16, true); // format chunk length
+            view.setUint16(20, 1, true); // sample format (raw)
+            view.setUint16(22, numOfChan, true); // channel count
+            view.setUint32(24, sampleRate, true); // sample rate
+            view.setUint32(28, sampleRate * blockAlign, true); // byte rate
+            view.setUint16(32, blockAlign, true); // block align
+            view.setUint16(34, bitRate, true); // bits per sample
+
+            // data chunk
+            writeString(view, 36, 'data'); // data chunk identifier
+            view.setUint32(40, dataSize, true); // data chunk length
+            let offset = 44;
+            for (let i = 0; i < buffer16.length; i++, offset += 2) {
+                view.setInt16(offset, buffer16[i], true);
+            }
+
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+
+        // Video Steganography
+        const videoEncodeFile = document.getElementById('video-file-encode');
+        const videoDecodeFile = document.getElementById('video-file-decode');
+        const videoEncodeBtn = document.getElementById('video-encode-btn');
+        const videoDecodeBtn = document.getElementById('video-decode-btn');
+
+        videoEncodeFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('video-preview-encode').src = URL.createObjectURL(file);
+            }
+        });
+
+        videoDecodeFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('video-preview-decode').src = URL.createObjectURL(file);
+            }
+        });
+
+        videoEncodeBtn.addEventListener('click', () => {
+            showMessage("Video encoding is highly experimental and currently not supported. This feature is a placeholder. You can use the audio steganography tab for audio files. We are working on adding support for video files.", true);
+        });
+
+        videoDecodeBtn.addEventListener('click', () => {
+            showMessage("Video decoding is highly experimental and currently not supported. This feature is a placeholder. You can use the audio steganography tab for audio files. We are working on adding support for video files.", true);
+        });
+
+        // Theme toggle logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', () => {
+            if (themeToggle.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+            }
+        });
+
+    </script>
+</body>
+</html>
