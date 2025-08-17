@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StegoNet - About Us</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <a href="index.html" class="logo-link">
+                <span class="logo-icon">🔒</span>
+                <h1 class="logo-text">StegoNet</h1>
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="about.html" class="nav-button">About Us</a>
+            <a href="contact.html" class="nav-button">Contact Us</a>
+        </div>
+        <div class="theme-toggle-container">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle" class="theme-toggle-label"></label>
+        </div>
+    </header>
+
+    <main class="content-section">
+        <div class="about-card">
+            <h2>About StegoNet</h2>
+            <p>StegoNet is a universal steganography tool designed for privacy, security, and educational purposes. This platform allows users to embed and extract secret messages within various types of digital media, including text, images, and audio.</p>
+            <p>What makes StegoNet unique is its commitment to a fully client-side approach. All encoding, decoding, and encryption are performed directly in your web browser, ensuring that your sensitive information never leaves your device and is not uploaded to any server. This provides a high level of privacy and security.</p>
+            <p>The site is built using only pure HTML, CSS, and vanilla JavaScript, demonstrating the power of modern web standards. User authentication is securely handled by Firebase Authentication, leveraging Google Sign-In for a seamless and secure login experience.</p>
+            <p>StegoNet was created by a developer known as "Deep With Darby" as a showcase of secure, client-side web technologies.</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 StegoNet. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Theme toggle logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', () => {
+            if (themeToggle.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+            }
+        });
+    </script>
+</body>
+</html>
