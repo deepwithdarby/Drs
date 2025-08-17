@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Steganography</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <a href="index.html" class="logo-link">
+                <span class="logo-icon">🔒</span>
+                <h1 class="logo-text">StegoNet</h1>
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="about.html" class="nav-button">About Us</a>
+            <a href="contact.html" class="nav-button">Contact Us</a>
+        </div>
+        <div class="theme-toggle-container">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle" class="theme-toggle-label"></label>
+        </div>
+    </header>
+
+    <main class="hero-section">
+        <div class="hero-content">
+            <div class="hero-logo">
+                <span class="logo-icon hero-icon">🔒</span>
+            </div>
+            <h2>Universal Steganography Suite</h2>
+            <p>Embed and extract secret messages in text, images, audio, and video, all within your browser.</p>
+            <button id="get-started-btn" class="cta-button">Get Started</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 StegoNet. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Login/Sign-up Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Sign in to Continue</h3>
+            <p>Your session is handled securely by Firebase.</p>
+            <button id="google-signin-btn" class="google-signin-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+                Sign in with Google
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAQ4sTdy1dC4IyMJFC9Yz3bVEBSEU_sbHI",
+            authDomain: "messaging-website-8cee3.firebaseapp.com",
+            projectId: "messaging-website-8cee3",
+            storageBucket: "messaging-website-8cee3.firebasestorage.app",
+            messagingSenderId: "1017918066104",
+            appId: "1:1017918066104:web:823f87c4b2c3d4929ed34d",
+            measurementId: "G-Q07MV0TB0H"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Check for existing user session
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // User is signed in, redirect to workspace
+                window.location.href = "workspace.html";
+            }
+        });
+
+        // Get modal elements
+        const loginModal = document.getElementById('login-modal');
+        const getStartedBtn = document.getElementById('get-started-btn');
+        const closeBtn = document.querySelector('.close-button');
+        const googleSigninBtn = document.getElementById('google-signin-btn');
+
+        // Open modal
+        getStartedBtn.addEventListener('click', () => {
+            loginModal.style.display = 'flex';
+        });
+
+        // Close modal
+        closeBtn.addEventListener('click', () => {
+            loginModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == loginModal) {
+                loginModal.style.display = 'none';
+            }
+        });
+
+        // Google Sign-in
+        googleSigninBtn.addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    // Sign-in successful, Firebase redirects automatically via onAuthStateChanged listener
+                }).catch((error) => {
+                    console.error("Google Sign-In Error:", error);
+                    alert("Sign-in failed. Please try again.");
+                });
+        });
+
+        // Theme toggle logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', () => {
+            if (themeToggle.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+            }
+        });
+    </script>
+</body>
+</html>
