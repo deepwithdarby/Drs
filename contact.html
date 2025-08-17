@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StegoNet - Contact Us</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <a href="index.html" class="logo-link">
+                <span class="logo-icon">🔒</span>
+                <h1 class="logo-text">StegoNet</h1>
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="about.html" class="nav-button">About Us</a>
+            <a href="contact.html" class="nav-button">Contact Us</a>
+        </div>
+        <div class="theme-toggle-container">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle" class="theme-toggle-label"></label>
+        </div>
+    </header>
+
+    <main class="content-section">
+        <div class="contact-card">
+            <h2>Contact Us</h2>
+            <p>If you have any questions or feedback, please use the form below to get in touch. Your message will be sent to the author's email using your default email client.</p>
+            <form action="mailto:deepwithdarby@gmail.com" method="post" enctype="text/plain">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" name="subject" required>
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" rows="6" required></textarea>
+                <button type="submit" class="cta-button">Send Message</button>
+            </form>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 StegoNet. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Theme toggle logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', () => {
+            if (themeToggle.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+            }
+        });
+    </script>
+</body>
+</html>
